@@ -1,0 +1,103 @@
+<USER_REQUEST>
+I am attaching frontside code first - from PIL import Image, ImageDraw, ImageFont
+import math
+
+def create_hackerhouse_id_card(
+    builder_name="[Builder's Name]",
+    team_name="[Team Name]",
+    tag_text="[TITLE / TAG]",
+    photo_path=None,
+    output_path="hackerhouse_goa_id_card_front_A7.png"
+):
+    # A7 dimensions at 300 DPI
+    width, height = 874, 1240
+    
+    # 1. Base Canvas (Dark Green)
+    bg_color = (18, 70, 48, 255) # Dark Goa Green
+    card = Image.new("RGBA", (width, height), bg_color)
+    draw = ImageDraw.Draw(card)
+
+    # 2. Border Pattern Function (Tribal Geometric Border)
+    def draw_tribal_border(draw, x_start, y_start, length, orientation='horizontal', border_size=28):
+        steps = length // border_size
+        for i in range(steps):
+            x = x_start + (i * border_size if orientation == 'horizontal' else 0)
+            y = y_start + (i * border_size if orientation == 'vertical' else 0)
+            
+            # Base yellow stripe
+            draw.rectangle([x, y, x + border_size, y + border_size], fill=(235, 190, 20))
+            
+            # Red diamond
+            draw.polygon([
+                (x, y + border_size / 2),
+                (x + border_size / 2, y),
+                (x + border_size, y + border_size / 2),
+                (x + border_size / 2, y + border_size)
+            ], fill=(210, 25, 50))
+            
+            # Center green diamond cutout
+            draw.polygon([
+                (x + border_size / 4, y + border_size / 2),
+                (x + border_size / 2, y + border_size / 4),
+                (x + 3 * border_size / 4, y + border_size / 2),
+                (x + border_size / 2, y + 3 * border_size / 4)
+            ], fill=bg_color)
+
+    # Render Top and Left Borders
+    border_size = 30
+    draw_tribal_border(draw, 0, 0, width, orientation='horizontal', border_size=border_size)
+    draw_tribal_border(draw, 0, 0, height, orientation='vertical', border_size=border_size)
+
+    # 3. Load Fonts
+    try:
+        font_header = ImageFont.truety
+<truncated 7100 bytes>
+255, 255, 255))
+    qdraw = ImageDraw.Draw(qr_box)
+
+    # Corner Squares
+    for box in [(20, 20), (qr_size - 100, 20), (20, qr_size - 100)]:
+        qdraw.rectangle([box[0], box[1], box[0] + 80, box[1] + 80], outline=(18, 70, 48), width=12)
+        qdraw.rectangle([box[0] + 24, box[1] + 24, box[0] + 56, box[1] + 56], fill=(18, 70, 48))
+
+    # Center Palm Tree Art Representation
+    qdraw.rectangle([qr_size//2 - 10, qr_size//2, qr_size//2 + 10, qr_size//2 + 80], fill=(18, 70, 48))
+    qdraw.arc([qr_size//2 - 60, qr_size//2 - 50, qr_size//2 + 60, qr_size//2 + 20], 180, 360, fill=(18, 70, 48), width=8)
+
+    card.paste(qr_box, (qr_x, qr_y))
+
+    # Cyan Neon Outer Glow Outline
+    draw.rounded_rectangle(
+        [qr_x - 16, qr_y - 16, qr_x + qr_size + 16, qr_y + qr_size + 16],
+        radius=32,
+        outline=(80, 230, 240),
+        width=4
+    )
+
+    # 4. Reduced-Size Written Content (Bottom)
+    try:
+        font_title = ImageFont.truetype("DejaVuSansMono-Bold.ttf", 24)
+        font_bullets = ImageFont.truetype("DejaVuSansMono.ttf", 20)
+    except IOError:
+        font_title = font_bullets = ImageFont.load_default()
+
+    text_x = 180
+    start_y = 880
+    line_height = 36
+
+    # Reduced-size yellow text lines
+    draw.text((text_x, start_y), "GOA  |  CAMP GUIDE INFO:", fill=(240, 220, 80), font=font_title)
+    draw.text((text_x + 20, start_y + line_height * 1.2), "* WiFi Network & Password", fill=(240, 220, 80), font=font_bullets)
+    draw.text((text_x + 20, start_y + line_height * 2.2), "* Main Camp Area Map", fill=(240, 220, 80), font=font_bullets)
+    draw.text((text_x + 20, start_y + line_height * 3.2), "* Point of Interest Directory", fill=(240, 220, 80), font=font_bullets)
+
+    # Save to file
+    card.save(output_path, format="PNG")
+    print(f"Back side ID card generated successfully as '{output_path}'.")
+
+if __name__ == "__main__":
+    create_id_card_back() : this completes the backside code 
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-08-13T20:36:09+05:30.
+</ADDITIONAL_METADATA>

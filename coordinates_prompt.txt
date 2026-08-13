@@ -1,0 +1,77 @@
+<USER_REQUEST>
+This is an **excellent, rock-solid execution plan**! Shifting from raw HTML5 Canvas coordinate math to declarative CSS with `html-to-image` is by far the cleanest, most maintainable approach. It eliminates coordinate guessing and lets us use Tailwind CSS classes to fine-tune alignments visually in real time.
+
+Here are the precise answers to your **Open Questions**, along with a quick technical tip to ensure the rendering is pixel-perfect.
+
+---
+
+## 📐 Answers to Your Open Questions (CSS Percentage Estimates)
+
+Based on the template layout, here are the percentage-based CSS coordinates for your absolute positioning overlay on `frontsideID.png` and `backsideID.png`:
+
+### 1. **Avatar Square (Front Card)**
+
+* **Top:** `28.5%`
+* **Left:** `50%` (Centered via `transform: translateX(-50%)`)
+* **Width:** `~46%` of card width
+* **Height / Aspect Ratio:** `Aspect-ratio: 1 / 1` (Square with `border-radius: 16px` / `rounded-2xl`)
+* **Styling:** `object-fit: cover` with `object-position: center top`
+
+### 2. **Text Stack: Builder's Name & Team Name (Front Card)**
+
+* **Top:** `65%`
+* **Left:** `50%` (Centered via `transform: translateX(-50%)`)
+* **Width:** `80%` (Text centered)
+* **Builder's Name:** Bold Yellow text (`#EBB414`), ~`1.5rem` / `text-2xl`
+* **Team Name:** Bold White text (`#FFFFFF`), ~`1.125rem` / `text-lg`
+
+### 3. **Pink Badge / Role Tag (Front Card)**
+
+* **Position:** `Bottom: 4.5%`, `Right: 4.5%`
+* **Width / Height:** `~26%` of card width (Circular badge, ~`1:1` ratio)
+* **Text Styling:** White text (`#FFFFFF`), bold, centered, rotated slightly (`transform: rotate(-10deg)` or straight, centered within the pink circle).
+
+### 4. **Neon QR Code (Back Card)**
+
+* **Is it dead center?** **Yes!**
+* **Top:** `48%`
+* **Left:** `50%` (Centered via `transform: translate(-50%, -50%)`)
+* **Width / Height:** `~48%` of card width (Square)
+* **Border Radius:** `rounded-2xl` (Matches the neon cyan frame inner bounds)
+
+---
+
+## 🛠️ Quick Technical Recommendations for `html-to-image`
+
+To avoid common pitfalls with `html-to-image` (such as blank images, font pop-in, or low-DPI exports for physical printing):
+
+1. **Set High Resolution (Pixel Ratio):** Pass `pixelRatio: 3` or `4` in the `toPng` options so the generated image is crisp enough for physical A7 printing at 300 DPI:
+```typescript
+import { toPng } from 'html-to-image';
+
+const dataUrl = await toPng(cardRef.current, {
+  pixelRatio: 3, // High DPI export
+  cacheBust: true,
+});
+
+```
+
+
+2. **CORS on Avatar Images:** Since user-uploaded photos might be blobs or external URLs, make sure the `<img>` tag for the avatar includes `crossOrigin="anonymous"` so `html-to-image` doesn't throw a taint canvas error.
+3. **Font Preloading:** Ensure your custom fonts (like `DejaVuSansMono` or local monospace) are fully loaded before calling `toPng()`, or pass them explicitly in the `fontEmbedCSS` option if fonts appear defaulted in the final export.
+
+---
+
+## 🏁 Final Verdict
+
+**Plan APPROVED!**
+
+You have full green light to:
+
+1. Install `html-to-image`.
+2. Implement `components/card/CardExporter.tsx` using the coordinate guide above.
+3. Wire up `GamifiedTreasureJourney.tsx` to handle the DOM snapshot, Vercel Blob upload, and 3D card display upon Mystery Chest unboxing.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-08-13T20:02:02+05:30.
+</ADDITIONAL_METADATA>

@@ -1,106 +1,125 @@
 'use client';
 
+import React from 'react';
 import type { BuilderProfile } from '@/lib/types';
 
 interface Props { profile: BuilderProfile; }
 
 export default function BuilderCardFront({ profile }: Props) {
-  const stackPreview = profile.stack?.slice(0, 3).join(' · ') ?? '';
-  return (
-    <div style={{
-      width: '100%', height: '100%',
-      background: 'linear-gradient(145deg, #075932 0%, #043b1f 100%)',
-      borderRadius: 'inherit', position: 'relative', overflow: 'hidden',
-      display: 'flex', flexDirection: 'column',
-      padding: '14px 18px 12px',
-      fontFamily: "'Inter', sans-serif",
-    }}>
-      {/* Border */}
-      <div style={{
-        position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-        background: 'linear-gradient(135deg, #ffe600, #ff007a, #ffe600)',
-        mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        maskComposite: 'exclude', WebkitMaskComposite: 'xor', padding: 2,
-      }} />
-      {/* Grid */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'linear-gradient(rgba(255,230,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,230,0,0.03) 1px, transparent 1px)',
-        backgroundSize: '22px 22px',
-      }} />
+ return (
+ <div
+ style={{
+ width: 874,
+ height: 1240,
+ position: 'relative',
+ fontFamily: 'sans-serif',
+ overflow: 'hidden',
+ }}
+ >
+ {/* 0. Deepest Background Layer */}
+ <div style={{
+ position: 'absolute',
+ inset: 0,
+ backgroundColor: 'rgb(18, 70, 48)',
+ zIndex: 0
+ }} />
 
-      {/* Top bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, position: 'relative', zIndex: 1 }}>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 11, fontWeight: 900, color: '#ffe600' }}>HACKER HOUSE</span>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 8.5, fontWeight: 700, color: '#ff007a' }}>#FrameInGoa</span>
-      </div>
-      <div style={{ height: 1.5, marginBottom: 10, background: 'linear-gradient(90deg, #ffe600, #ff007a)', position: 'relative', zIndex: 1 }} />
+ {/* 1. Dynamic User Photo (Layered BEHIND the template to naturally dodge the baked-in hat brim) */}
+ <div style={{
+ position: 'absolute',
+ top: 378,
+ left: 272,
+ width: 360,
+ height: 360,
+ borderRadius: 12,
+ overflow: 'hidden',
+ zIndex: 1,
+ }}>
+ {profile.photo ? (
+ <img
+ src={profile.photo}
+ alt="Portrait"
+ style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+ />
+ ) : (
+ <div style={{ width: '100%', height: '100%', backgroundColor: '#cccccc' }} />
+ )}
+ </div>
 
-      {/* Content */}
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flex: 1, position: 'relative', zIndex: 1 }}>
-        {/* Photo */}
-        <div style={{
-          width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
-          background: 'linear-gradient(135deg, #ffe600, #ff007a)', padding: 2.5,
-        }}>
-          <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#043b1f' }}>
-            {profile.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profile.photo} alt={profile.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26 }}>👤</div>
-            )}
-          </div>
-        </div>
+ {/* 2. Base Template Layer (Contains the baked-in hat, borders, and a transparent photo hole) */}
+ <div style={{
+ position: 'absolute',
+ inset: 0,
+ backgroundImage: "url('/hhgoa_front_base.png')",
+ backgroundSize: '100% 100%',
+ pointerEvents: 'none',
+ zIndex: 2
+ }} />
 
-        {/* Text */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Class badge */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 3,
-            padding: '3px 8px', borderRadius: 999,
-            background: '#ff007a', border: '1px solid #ffe600',
-            fontSize: 7.5, color: '#ffffff', fontWeight: 800, marginBottom: 4,
-          }}>
-            {profile.builderClassEmoji} {profile.builderClass}
-          </div>
+ {/* 3. Foreground Text Layer */}
+ <div style={{ position: 'absolute', inset: 0, zIndex: 3, pointerEvents: 'none' }}>
+ {/* 2. Builder Name */}
+ <div style={{
+ position: 'absolute',
+ top: 800,
+ left: 0,
+ right: 0,
+ textAlign: 'center',
+ color: '#EBB414',
+ fontSize: 76,
+ fontWeight: 800,
+ fontFamily: "'Space Mono', monospace",
+ letterSpacing: '0.05em',
+ textShadow: '0 4px 12px rgba(0,0,0,0.6)',
+ }}>
+ {profile.name || 'Builder Name'}
+ </div>
 
-          <div style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: 'clamp(14px, 4vw, 18px)', fontWeight: 900, color: '#ffe600',
-            lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
-            {profile.name.toUpperCase()}
-          </div>
+ {/* 3. Tribe / Team Name */}
+ <div style={{
+ position: 'absolute',
+ top: 900,
+ left: 0,
+ right: 0,
+ textAlign: 'center',
+ color: '#ffffff',
+ fontSize: 52,
+ fontWeight: 600,
+ fontFamily: "'Space Mono', monospace",
+ letterSpacing: '0.05em',
+ textShadow: '0 4px 12px rgba(0,0,0,0.6)',
+ }}>
+ {profile.tribe === 'team' && profile.teamName
+ ? profile.teamName
+ : 'Solo Builder'}
+ </div>
+ </div>
 
-          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 9, color: '#ffffff', fontWeight: 700, marginTop: 3 }}>
-            {profile.primaryRole}
-          </div>
-
-          {stackPreview && (
-            <div style={{ fontSize: 8, color: '#a2dfbb', marginTop: 2 }}>
-              {stackPreview}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginTop: 8, paddingTop: 7, borderTop: '1px solid rgba(255,230,0,0.2)',
-        position: 'relative', zIndex: 1,
-      }}>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 7.5, color: '#a2dfbb' }}>
-          {profile.builderId}
-        </span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {['#ffe600','#ff007a','#a3e635'].map((c) => (
-            <div key={c} style={{ width: 6, height: 6, borderRadius: '50%', background: c }} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+ {/* 4. Pink Badge / Role Tag (Front Card) */}
+ {/* Absolute positioning to precisely overlay the text onto the BAKED-IN pink stamp in hhgoa_front_base.png */}
+ <div style={{
+ position: 'absolute',
+ bottom: 85, // Moved down to center perfectly
+ right: 45, // Moved right to center perfectly
+ width: 140, // fixed width for text centering over stamp
+ display: 'flex', alignItems: 'center', justifyContent: 'center',
+ transform: 'rotate(-12deg)',
+ zIndex: 4,
+ }}>
+ <span style={{
+ color: '#FFE600', // Yellow like the GOA badge
+ fontSize: profile.builderClass ? '24px' : '32px',
+ fontFamily: "'Samarkan', 'Space Mono', system-ui, sans-serif",
+ fontWeight: '900',
+ textAlign: 'center',
+ lineHeight: '1.1',
+ textShadow: '0 2px 6px rgba(255, 0, 122, 0.8), 0 2px 4px rgba(0,0,0,0.5)',
+ wordWrap: 'break-word',
+ maxWidth: '100%',
+ }}>
+ {profile.builderClass || profile.primaryRole || 'Builder'}
+ </span>
+ </div>
+ </div>
+ );
 }

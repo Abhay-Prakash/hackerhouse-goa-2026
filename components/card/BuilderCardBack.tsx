@@ -1,103 +1,107 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { generateQRDataUrl } from '@/lib/qr';
+import React, { useEffect, useState } from 'react';
 import type { BuilderProfile } from '@/lib/types';
+import { QRCodeSVG } from 'qrcode.react';
+import TribalBorder from './TribalBorder';
 
-interface Props { profile: BuilderProfile; }
+interface Props { profile: BuilderProfile; shareUrl?: string; }
 
-const QR_URL = 'https://hackerhousegoa.com';
-
-export default function BuilderCardBack({ profile }: Props) {
-  const [qr, setQr] = useState<string | null>(null);
-  const shareUrl = profile.cardId ? `${QR_URL}/card/${profile.cardId}` : QR_URL;
+export default function BuilderCardBack({ profile, shareUrl }: Props) {
+  const [url, setUrl] = useState(shareUrl || 'https://hackerhousegoa.com');
 
   useEffect(() => {
-    generateQRDataUrl(shareUrl).then(setQr).catch(console.error);
-  }, [shareUrl]);
+    if (!shareUrl && typeof window !== 'undefined') {
+      setUrl(`${window.location.origin}/card/${profile.cardId ?? ''}`);
+    }
+  }, [shareUrl, profile.cardId]);
+
+  const qr_size = 460;
+  const qr_x = (874 - qr_size) / 2; // 207
+  const qr_y = 350;
+  
+  const text_x = 160;
+  const start_y = 920;
+  const line_spacing = 42;
 
   return (
-    <div style={{
-      width: '100%', height: '100%',
-      background: 'linear-gradient(145deg, #043b1f 0%, #075932 100%)',
-      borderRadius: 'inherit', position: 'relative', overflow: 'hidden',
-      display: 'flex', flexDirection: 'column',
-      padding: '14px 18px 12px',
-      fontFamily: "'Inter', sans-serif",
-    }}>
-      {/* Border */}
+    <div
+      style={{
+        width: 874,
+        height: 1240,
+        backgroundColor: 'rgb(18, 70, 48)', // Dark Goa Forest Green
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: "'Space Mono', monospace",
+      }}
+    >
+      {/* 1. Tribal Pattern Border (Top & Left) */}
+      <TribalBorder orientation="horizontal" size={32} length={874} />
+      <TribalBorder orientation="vertical" size={32} length={1240} />
+
+      {/* 2. Glowing Designer QR Container */}
+      {/* Cyan Outer Neon Glow Frame */}
       <div style={{
-        position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-        background: 'linear-gradient(135deg, #ffe600, #ff007a, #ffe600)',
-        mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-        maskComposite: 'exclude', WebkitMaskComposite: 'xor', padding: 2,
+        position: 'absolute',
+        top: qr_y - 12,
+        left: qr_x - 12,
+        width: qr_size + 24,
+        height: qr_size + 24,
+        borderRadius: 36,
+        border: '5px solid rgb(80, 230, 240)',
+        boxShadow: '0 0 20px rgba(80, 230, 240, 0.6), inset 0 0 20px rgba(80, 230, 240, 0.6)',
+        zIndex: 1,
       }} />
-      {/* Grid */}
+
+      {/* White Rounded QR Base Box */}
       <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'linear-gradient(rgba(255,230,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,230,0,0.03) 1px, transparent 1px)',
-        backgroundSize: '22px 22px',
-      }} />
-
-      {/* Top bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, position: 'relative', zIndex: 1 }}>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 11, fontWeight: 900, color: '#ffe600' }}>HACKER HOUSE</span>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 8.5, fontWeight: 700, color: '#ff007a' }}>#FrameInGoa</span>
-      </div>
-      <div style={{ height: 1.5, marginBottom: 10, background: 'linear-gradient(90deg, #ffe600, #ff007a)', position: 'relative', zIndex: 1 }} />
-
-      {/* QR + info */}
-      <div style={{ display: 'flex', gap: 12, flex: 1, position: 'relative', zIndex: 1 }}>
-        {/* QR */}
-        <div style={{
-          background: '#fff', borderRadius: 8, padding: 4,
-          width: 68, height: 68, flexShrink: 0,
-          border: '2px solid #ffe600',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          {qr ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={qr} alt="QR" style={{ width: 60, height: 60 }} />
-          ) : (
-            <div style={{ width: 60, height: 60, background: '#f4f4f4', borderRadius: 3 }} />
-          )}
-        </div>
-
-        {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 3,
-            padding: '3px 8px', borderRadius: 999,
-            background: '#ff007a', border: '1px solid #ffe600',
-            fontSize: 7.5, color: '#ffffff', fontWeight: 800, marginBottom: 5,
-          }}>✓ VERIFIED BUILDER</div>
-
-          {[
-            { l: 'ID', v: profile.registrationId ?? profile.builderId },
-            { l: 'CLASS', v: `${profile.builderClassEmoji ?? ''} ${profile.builderClass ?? '—'}` },
-            { l: 'ROLE', v: profile.primaryRole ?? '—' },
-            ...(profile.tribe === 'team' && profile.teamName ? [{ l: 'CREW', v: profile.teamName }] : []),
-          ].map((row) => (
-            <div key={row.l} style={{ marginBottom: 4 }}>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 6.5, color: '#a2dfbb', letterSpacing: '0.08em' }}>{row.l}</div>
-              <div style={{
-                fontSize: 9, color: '#ffffff', fontWeight: 700,
-                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>{row.v}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom */}
-      <div style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        marginTop: 7, paddingTop: 6, borderTop: '1px solid rgba(255,230,0,0.2)',
-        position: 'relative', zIndex: 1,
+        position: 'absolute',
+        top: qr_y,
+        left: qr_x,
+        width: qr_size,
+        height: qr_size,
+        backgroundColor: 'rgb(248, 246, 240)',
+        borderRadius: 32,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 2,
       }}>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 7, color: '#a2dfbb' }}>hackerhousegoa.com</span>
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 7, color: '#ffe600', fontWeight: 700 }}>#FrameInGoa</span>
+        {/* Real Scannable QR Code */}
+        <QRCodeSVG
+          value={url}
+          size={380}
+          level="H"
+          includeMargin={false}
+          fgColor="rgb(18, 70, 48)"
+          bgColor="transparent"
+        />
+      </div>
+
+      {/* 3. Bottom Guide Info Typography */}
+      <div style={{
+        position: 'absolute',
+        top: 860, // Moved up closer to the QR code (810 is bottom of QR)
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        zIndex: 3,
+      }}>
+        <div style={{
+          color: 'rgb(240, 220, 80)', // Warm Gold/Yellow
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center', // Centers the text itself
+          gap: 15,
+        }}>
+          <div style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 6, letterSpacing: '0.05em' }}>
+            GOA  |  CAMP GUIDE INFO:
+          </div>
+          <div style={{ fontSize: 22, opacity: 0.9 }}>* WiFi Network & Password</div>
+          <div style={{ fontSize: 22, opacity: 0.9 }}>* Main Camp Area Map</div>
+          <div style={{ fontSize: 22, opacity: 0.9 }}>* Point of Interest Directory</div>
+        </div>
       </div>
     </div>
   );
