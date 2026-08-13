@@ -7,12 +7,9 @@ import { processPhoto } from '@/lib/imageProcessor';
 import { determineBuilderClass } from '@/lib/builderClass';
 import Card3DPreview from '@/components/card/Card3DPreview';
 import CardExporter, { CardExporterRef } from '@/components/card/CardExporter';
-import { Canvas } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
 import CapPop from '@/components/gamified/CapPop';
 import TreePop from '@/components/gamified/TreePop';
 import ChairPop from '@/components/gamified/ChairPop';
-import TreasureChest3D from '@/components/3d/TreasureChest3D';
 import { verifyPortrait } from '@/lib/portrait-verification';
 
 const MAIN_SITE_URL = 'https://hhgoa.com/';
@@ -30,17 +27,18 @@ const ROLES = [
  { id: 'Other', icon: '', label: 'Other' },
 ];
 
-const STACKS = [
- 'Python', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js',
- 'Go', 'Rust', 'Java', 'Kotlin', 'Swift', 'C++',
- 'PyTorch', 'TensorFlow', 'JAX', 'Scikit-learn',
- 'Flutter', 'React Native',
- 'Solidity', 'Web3.js', 'Move',
- 'Docker', 'Kubernetes', 'Terraform', 'AWS', 'GCP',
- 'Arduino', 'Raspberry Pi', 'FPGA',
- 'SQL', 'PostgreSQL', 'MongoDB', 'Redis',
- 'Vue.js', 'Svelte', 'Angular',
-];
+const DOMAIN_STACKS: Record<string, string[]> = {
+  'AI / ML': ['Python', 'PyTorch', 'TensorFlow', 'JAX', 'Scikit-learn', 'Hugging Face', 'CUDA', 'OpenCV'],
+  'Software': ['Rust', 'Go', 'C++', 'Java', 'Python', 'Kotlin', 'Zig', 'System Architecture', 'Swift', 'Flutter', 'React Native'],
+  'Product': ['Figma', 'Notion', 'Jira', 'Linear', 'Product Strategy', 'User Research', 'GTM', 'Analytics'],
+  'Design': ['Figma', 'Canva', 'Adobe CC', 'Framer', 'Spline', 'Protopie', 'UI/UX', 'Interaction Design'],
+  'Hardware': ['Arduino', 'Raspberry Pi', 'FPGA', 'VHDL', 'C', 'PCB Design', 'Soldering', 'Microcontrollers'],
+  'Research': ['Python', 'R', 'MATLAB', 'LaTeX', 'Data Analysis', 'Literature Review', 'Statistical Modeling'],
+  'Web': ['React', 'Next.js', 'Vue.js', 'Svelte', 'TypeScript', 'Tailwind', 'Node.js', 'PostgreSQL'],
+  'Crypto': ['Solidity', 'Web3.js', 'Ethers.js', 'Ethereum', 'Move', 'Rust', 'Smart Contracts', 'Zero Knowledge'],
+  'Automation': ['Python', 'Bash', 'Docker', 'Kubernetes', 'Ansible', 'Terraform', 'CI/CD', 'Zapier'],
+  'Other': ['Python', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js', 'Go', 'Rust', 'Docker', 'SQL']
+};
 
 export default function GamifiedTreasureJourney() {
  const exporterRef = useRef<CardExporterRef>(null);
@@ -777,20 +775,21 @@ export default function GamifiedTreasureJourney() {
 
  {/* Roles */}
  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))', gap: 10, marginBottom: 28 }}>
- {ROLES.map((role) => (
- <button
- key={role.id}
- className={`dna-tile ${selectedRole === role.id ? 'selected' : ''}`}
- onClick={() => {
- setSelectedRole(role.id);
- setProfile((p) => ({ ...p, primaryRole: role.id }));
- }}
- >
- <span style={{ fontSize: 24 }}>{role.icon}</span>
- <span style={{ fontSize: 11, fontWeight: 700, color: selectedRole === role.id ? 'var(--goa-yellow)' : 'var(--text-muted)' }}>
- {role.label}
- </span>
- </button>
+ {ROLES.map((r) => (
+  <button
+  key={r.id}
+  className={`dna-tile ${selectedRole === r.id ? 'selected' : ''}`}
+  onClick={() => {
+    if (selectedRole !== r.id) {
+      setSelectedRole(r.id);
+      setSelectedStack([]); // Reset stack when role changes
+      setProfile((p) => ({ ...p, primaryRole: r.id, stack: [], builderClass: undefined, builderClassEmoji: undefined }));
+    }
+  }}
+  >
+  <div style={{ fontSize: 28, marginBottom: 4 }}>{r.icon}</div>
+  <div style={{ fontSize: 13, fontWeight: 700 }}>{r.label}</div>
+  </button>
  ))}
  </div>
 
@@ -803,21 +802,21 @@ export default function GamifiedTreasureJourney() {
  Select all tools apply.
  </p>
  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
- {STACKS.map((s) => (
- <button
- key={s}
- className={`stack-chip ${selectedStack.includes(s) ? 'selected' : ''}`}
- onClick={() => {
- const next = selectedStack.includes(s) ? selectedStack.filter((x) => x !== s) : [...selectedStack, s];
- setSelectedStack(next);
- setProfile((p) => ({ ...p, stack: next }));
- }}
- >
- {selectedStack.includes(s) && <span>✓</span>}
- {s}
- </button>
- ))}
- </div>
+ {(DOMAIN_STACKS[selectedRole] || DOMAIN_STACKS['Other']).map((s) => (
+  <button
+  key={s}
+  className={`stack-chip ${selectedStack.includes(s) ? 'selected' : ''}`}
+  onClick={() => {
+  const next = selectedStack.includes(s) ? selectedStack.filter((x) => x !== s) : [...selectedStack, s];
+  setSelectedStack(next);
+  setProfile((p) => ({ ...p, stack: next }));
+  }}
+  >
+  {selectedStack.includes(s) && <span>✓</span>}
+  {s}
+  </button>
+  ))}
+  </div>
  </div>
  )}
 
@@ -1016,46 +1015,56 @@ export default function GamifiedTreasureJourney() {
 
  {/* TAP-TO-UNBOX MYSTERY CHEST INTERACTION */}
  <div style={{ position: 'relative', margin: '20px auto 36px' }}>
- {!chestOpened ? (
- <motion.div
- whileHover={{ scale: 1.06, rotate: [-2, 2, -2] }}
- whileTap={{ scale: isPersisting ? 1 : 0.94 }}
- onClick={isPersisting ? undefined : handleOpenChest}
- style={{
- cursor: 'pointer', width: 220, height: 200, margin: '0 auto',
- borderRadius: 28, background: 'linear-gradient(135deg, #7c3aed, #FF007A, #064e29)',
- border: '4px solid #00F0FF',
- boxShadow: '0 0 45px rgba(0,240,255,0.5), 0 10px 30px rgba(0,0,0,0.6)',
- display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
- }}
- >
- <motion.div
- animate={{ y: [0, -8, 0] }}
- transition={{ duration: 1.5, repeat: Infinity }}
- style={{ fontSize: 64, marginBottom: 8 }}
- >
- 
- </motion.div>
- <div style={{
- fontSize: 12, fontWeight: 900, color: '#ffffff',
- background: 'rgba(0,0,0,0.5)', padding: '6px 16px', borderRadius: 999,
- border: '1.5px solid #FF007A', letterSpacing: '0.06em',
- display: 'flex', alignItems: 'center', gap: 6,
- }}>
- {isPersisting ? (
- <><div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> UNLOCKING...</>
- ) : (
- 'TAP TO UNBOX '
- )}
- </div>
- </motion.div>
- ) : (
- /* UNBOXED 3D BUILDER ID CARD EMERGES WITH PARTICLE BURST */
- <motion.div
- initial={{ scale: 0.3, y: 80, opacity: 0 }}
- animate={{ scale: 1, y: 0, opacity: 1 }}
- transition={{ type: 'spring', stiffness: 140, damping: 18 }}
- >
+ <AnimatePresence mode="wait">
+  {!chestOpened ? (
+  <motion.div
+  key="closed-chest"
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  exit={{ opacity: 0, scale: 1.2, filter: 'blur(10px)' }}
+  whileHover={{ scale: 1.05, rotate: [-2, 2, -2] }}
+  whileTap={{ scale: isPersisting ? 1 : 0.95 }}
+  onClick={isPersisting ? undefined : handleOpenChest}
+  style={{
+  cursor: 'pointer', width: 320, height: 320, margin: '0 auto',
+  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+  position: 'relative'
+  }}
+  >
+  <motion.img
+  animate={isPersisting ? {
+    rotate: [0, -6, 6, -6, 6, 0],
+    scale: [1, 1.08, 1.08, 1.08, 1],
+    filter: ['drop-shadow(0 20px 30px rgba(0,0,0,0.6))', 'drop-shadow(0 0 60px rgba(255,230,0,0.9))']
+  } : { y: [0, -10, 0] }}
+  transition={isPersisting ? { duration: 0.4, repeat: Infinity } : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
+  src="/treasureboxclose.png"
+  alt="Treasure Chest"
+  style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.6))' }}
+  />
+  <div style={{
+  position: 'absolute', bottom: 10,
+  fontSize: 12, fontWeight: 900, color: '#ffffff',
+  background: 'rgba(0,0,0,0.7)', padding: '8px 20px', borderRadius: 999,
+  border: '2px solid #FF007A', letterSpacing: '0.08em',
+  display: 'flex', alignItems: 'center', gap: 6,
+  boxShadow: '0 4px 12px rgba(255,0,122,0.4)',
+  }}>
+  {isPersisting ? (
+  <><div className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} /> UNLOCKING...</>
+  ) : (
+  'TAP TO UNBOX'
+  )}
+  </div>
+  </motion.div>
+  ) : (
+  /* UNBOXED 3D BUILDER ID CARD EMERGES WITH PARTICLE BURST */
+  <motion.div
+  key="opened-chest"
+  initial={{ scale: 0.8, opacity: 0 }}
+  animate={{ scale: 1, opacity: 1 }}
+  transition={{ type: 'spring', stiffness: 140, damping: 18 }}
+  >
  <div className="goa-hindi-badge" style={{ fontSize: 18, marginBottom: 12 }}>
  TREASURE UNLOCKED · BUILDER IDENTITY
  </div>
@@ -1069,27 +1078,23 @@ export default function GamifiedTreasureJourney() {
  </p>
 
  {/* 3D Card floating up from Treasure Chest and Chest rendering together */}
- <div style={{ marginBottom: 32, position: 'relative', minHeight: 520 }}>
- <div style={{ position: 'absolute', inset: 0, zIndex: 1, transform: 'translateY(100px)' }}>
- <Canvas camera={{ position: [0, 2, 7], fov: 45 }}>
- <ambientLight intensity={2} />
- <directionalLight position={[0, 10, 10]} intensity={2} />
- <Environment preset="city" />
- <TreasureChest3D isOpen={chestOpened} />
- </Canvas>
+ <div style={{ marginBottom: 32, position: 'relative', minHeight: 560, display: 'flex', justifyContent: 'center' }}>
+ <div style={{ position: 'absolute', bottom: -50, left: '50%', transform: 'translateX(-50%)', zIndex: 1, width: 380, height: 380 }}>
+ <img src="/treasureboxopen.webp" alt="Opened Chest" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.8))' }} />
  </div>
  
  <motion.div
  initial={{ opacity: 0, y: 150, scale: 0.2 }}
  animate={chestOpened ? { opacity: 1, y: 0, scale: 1 } : {}}
  transition={{ delay: 0.5, duration: 1.5, type: 'spring', bounce: 0.3 }}
- style={{ position: 'relative', zIndex: 2, height: '100%' }}
+ style={{ position: 'relative', zIndex: 2, height: '100%', width: '100%' }}
  >
  <Card3DPreview profile={profile} />
  </motion.div>
  </div>
- </motion.div>
- )}
+  </motion.div>
+  )}
+  </AnimatePresence>
  </div>
 
  {/* DOWNLOAD & SHARE BUTTONS */}

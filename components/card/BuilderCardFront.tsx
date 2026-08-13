@@ -50,7 +50,7 @@ export default function BuilderCardFront({ profile }: Props) {
  <div style={{
  position: 'absolute',
  inset: 0,
- backgroundImage: "url('/hhgoa_front_base.png')",
+ backgroundImage: "url('/hhgoa_front_base.webp')",
  backgroundSize: '100% 100%',
  pointerEvents: 'none',
  zIndex: 2
