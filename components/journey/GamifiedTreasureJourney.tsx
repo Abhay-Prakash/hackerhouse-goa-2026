@@ -333,40 +333,8 @@ export default function GamifiedTreasureJourney() {
  boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
  }}>
  <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--goa-yellow)', letterSpacing: '0.08em' }}>
- INVENTORY:
+ CLAIM YOUR ID CARD, HACK THE HOUSE
  </span>
- <motion.span
- animate={{ scale: earnedItems.safariCap ? [1, 1.4, 1] : 1 }}
- transition={{ duration: 0.3 }}
- style={{ opacity: earnedItems.safariCap ? 1 : 0.3, fontSize: 18, filter: earnedItems.safariCap ? 'drop-shadow(0 0 6px #00F0FF)' : 'grayscale(1)' }}
- title="Safari Cap"
- >
- 
- </motion.span>
- <motion.span
- animate={{ scale: earnedItems.coconutPalm ? [1, 1.4, 1] : 1 }}
- transition={{ duration: 0.3 }}
- style={{ opacity: earnedItems.coconutPalm ? 1 : 0.3, fontSize: 18, filter: earnedItems.coconutPalm ? 'drop-shadow(0 0 6px #00F0FF)' : 'grayscale(1)' }}
- title="Coconut Palm"
- >
- 
- </motion.span>
- <motion.span
- animate={{ scale: earnedItems.beachChair ? [1, 1.4, 1] : 1 }}
- transition={{ duration: 0.3 }}
- style={{ opacity: earnedItems.beachChair ? 1 : 0.3, fontSize: 18, filter: earnedItems.beachChair ? 'drop-shadow(0 0 6px #00F0FF)' : 'grayscale(1)' }}
- title="Beach Chair"
- >
- 
- </motion.span>
- <motion.span
- animate={{ scale: earnedItems.treasureCard ? [1, 1.5, 1] : 1 }}
- transition={{ duration: 0.3 }}
- style={{ opacity: earnedItems.treasureCard ? 1 : 0.3, fontSize: 18, filter: earnedItems.treasureCard ? 'drop-shadow(0 0 8px #FFE600)' : 'grayscale(1)' }}
- title="Builder Card"
- >
- 
- </motion.span>
  </div>
 
  <a
