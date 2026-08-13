@@ -1,26 +1,329 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@500;700;800&family=Space+Mono:wght@400;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Brand Tokens (Goan Emerald & Sunshine Palette) ───────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-void:        #064e29;
+  --bg-deep:        #043b1f;
+  --bg-surface:     #096336;
+  --bg-card-sand:   #f6faf6;
+  --bg-forest-dark: #0c2d1f;
+  --neon-cyan:      #00f0ff;
+  --goa-green:      #075932;
+  --goa-emerald:    #006837;
+  --goa-yellow:     #ffe600;
+  --goa-pink:       #ff007a;
+  --goa-sand:       #f4fbf7;
+  --goa-white:      #ffffff;
+  --text-primary:    #ffffff;
+  --text-dark:       #032615;
+  --text-muted:      #a2dfbb;
+  --border-subtle:   rgba(255, 230, 0, 0.2);
+  --border-glow:     rgba(255, 230, 0, 0.4);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─── Base ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100svh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* ─── Journey Shell & Vertical Flow ─────────────────────────────────────────── */
+.journey-stage {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 90px 20px 80px;
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Goan Serif Title ─────────────────────────────────────────────────────── */
+.goa-title-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 900;
+  color: var(--goa-yellow);
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.goa-retro-mono {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.goa-hindi-badge {
+  background: var(--goa-pink);
+  color: #ffffff;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--goa-yellow);
+  box-shadow: 0 4px 14px rgba(255,0,122,0.4);
+  display: inline-block;
+  transform: rotate(-3deg);
+  font-size: 1.1em;
+}
+
+/* ─── Progress Stamps ───────────────────────────────────────────────────────── */
+.stamp-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: linear-gradient(to bottom, rgba(6,78,41,0.96) 80%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,230,0,0.15);
+}
+
+.stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  position: relative;
+}
+
+.stamp::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,230,0,0.2);
+  z-index: -1;
+}
+.stamp:last-child::after { display: none; }
+
+.stamp-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,230,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.4s ease;
+  background: var(--bg-deep);
+  position: relative;
+}
+
+.stamp.done .stamp-circle {
+  background: var(--goa-yellow);
+  border-color: var(--goa-yellow);
+  color: var(--text-dark);
+  font-weight: bold;
+}
+
+.stamp.active .stamp-circle {
+  background: var(--goa-pink);
+  border-color: var(--goa-yellow);
+  box-shadow: 0 0 16px rgba(255,0,122,0.5);
+  color: #fff;
+}
+
+.stamp-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.stamp.done .stamp-label { color: var(--goa-yellow); }
+.stamp.active .stamp-label { color: #ffffff; }
+
+.stamp-connector {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,230,0,0.2);
+  transition: background 0.4s;
+}
+.stamp-connector.done { background: var(--goa-yellow); }
+
+/* ─── Buttons ───────────────────────────────────────────────────────────────── */
+.btn-journey {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 36px; border-radius: 14px;
+  font-weight: 900; font-size: 16px; letter-spacing: 0.05em;
+  cursor: pointer; border: 2px solid var(--goa-yellow);
+  background: linear-gradient(135deg, var(--goa-yellow), #ffd000);
+  color: var(--text-dark);
+  transition: filter 0.2s, transform 0.15s;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 0 15px rgba(255,230,0,0.2);
+}
+.btn-journey:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.btn-journey:active { transform: scale(0.97); }
+
+.btn-pink {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 36px; border-radius: 14px;
+  font-weight: 900; font-size: 16px; letter-spacing: 0.05em;
+  cursor: pointer; border: 2px solid var(--goa-yellow);
+  background: linear-gradient(135deg, var(--goa-pink), #e0006c);
+  color: #ffffff;
+  transition: filter 0.2s, transform 0.15s;
+  box-shadow: 0 8px 24px rgba(255,0,122,0.3);
+}
+.btn-pink:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.btn-pink:active { transform: scale(0.97); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 28px; border-radius: 12px;
+  font-weight: 700; font-size: 15px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid var(--border-glow);
+  color: var(--goa-yellow);
+  transition: all 0.2s;
+}
+.btn-ghost:hover { background: rgba(255,230,0,0.12); box-shadow: 0 0 20px rgba(255,230,0,0.2); }
+.btn-ghost:active { transform: scale(0.97); }
+
+.btn-x {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 28px; border-radius: 12px;
+  font-weight: 700; font-size: 15px;
+  cursor: pointer;
+  background: #000;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: #fff;
+  transition: all 0.2s;
+}
+.btn-x:hover { border-color: rgba(255,255,255,0.3); background: #111; }
+.btn-x:active { transform: scale(0.97); }
+
+/* ─── Input ─────────────────────────────────────────────────────────────────── */
+.input-field {
+  width: 100%; padding: 14px 18px; border-radius: 12px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,230,0,0.25);
+  color: var(--text-primary);
+  font-family: inherit; font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field::placeholder { color: var(--text-muted); }
+.input-field:focus {
+  border-color: var(--goa-yellow);
+  box-shadow: 0 0 0 3px rgba(255,230,0,0.2);
+}
+
+/* ─── DNA Tile (Goan Pattern Card Style) ────────────────────────────────────── */
+.dna-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 18px 12px; border-radius: 16px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border: 2px solid rgba(255,255,255,0.12);
+  transition: all 0.2s;
+  text-align: center;
+  min-height: 94px;
+  user-select: none;
+}
+.dna-tile:hover {
+  border-color: var(--goa-yellow);
+  background: rgba(255,230,0,0.08);
+  transform: translateY(-2px);
+}
+.dna-tile.selected {
+  border-color: var(--goa-yellow);
+  background: rgba(255,230,0,0.18);
+  box-shadow: 0 0 24px rgba(255,230,0,0.25);
+}
+
+/* ─── Stack Chip ────────────────────────────────────────────────────────────── */
+.stack-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 999px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  font-size: 13px; font-weight: 600; color: var(--text-muted);
+  transition: all 0.18s;
+  user-select: none;
+  white-space: nowrap;
+}
+.stack-chip:hover { border-color: var(--goa-pink); color: #fff; }
+.stack-chip.selected {
+  background: var(--goa-pink);
+  border-color: var(--goa-yellow);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(255,0,122,0.3);
+}
+
+/* ─── Tribe Card ────────────────────────────────────────────────────────────── */
+.tribe-card {
+  flex: 1; padding: 28px 20px; border-radius: 20px;
+  border: 2px solid rgba(255,230,0,0.25);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer; text-align: center;
+  transition: all 0.25s;
+  user-select: none;
+}
+.tribe-card:hover { border-color: var(--goa-yellow); background: rgba(255,230,0,0.08); transform: translateY(-2px); }
+.tribe-card.selected {
+  border-color: var(--goa-yellow);
+  background: rgba(255,230,0,0.18);
+  box-shadow: 0 0 30px rgba(255,230,0,0.3);
+}
+
+/* ─── Polaroid frame ────────────────────────────────────────────────────────── */
+.polaroid-frame {
+  background: #ffffff;
+  padding: 14px 14px 42px;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s;
+  display: inline-block;
+  border: 2px solid var(--goa-yellow);
+}
+.polaroid-frame:hover { transform: rotate(0deg) scale(1.02); }
+
+/* ─── 3D Card ───────────────────────────────────────────────────────────────── */
+.card-scene { perspective: 1200px; touch-action: none; user-select: none; }
+.card-3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
+.card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 24px; overflow: hidden; }
+.card-face-back { transform: rotateY(180deg); }
+
+/* ─── Spinner ───────────────────────────────────────────────────────────────── */
+.spinner {
+  width: 22px; height: 22px;
+  border: 2.5px solid rgba(255,230,0,0.3);
+  border-top-color: var(--goa-yellow);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: rgba(255,230,0,0.25); border-radius: 3px; }
