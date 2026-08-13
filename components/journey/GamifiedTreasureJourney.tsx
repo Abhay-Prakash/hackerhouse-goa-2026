@@ -516,10 +516,10 @@ export default function GamifiedTreasureJourney() {
  style={{ marginTop: 24, opacity: 0.9, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
  onClick={() => step01Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
  >
- <div className="goa-retro-mono" style={{ fontSize: 10, letterSpacing: '0.2em', color: 'var(--goa-yellow)', marginBottom: 8, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+ <div className="goa-retro-mono" style={{ fontSize: 10, letterSpacing: '0.2em', color: 'var(--goa-pink)', marginBottom: 8, textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
  {mapUnlocked ? "SCROLL DOWN" : "EXPLORE THE TRAIL"}
  </div>
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--goa-yellow)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }}>
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--goa-pink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.8))' }}>
  <path d="M12 5v14M19 12l-7 7-7-7" />
  </svg>
  </motion.div>
