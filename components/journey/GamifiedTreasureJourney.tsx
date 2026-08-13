@@ -6,7 +6,7 @@ import type { BuilderProfile } from '@/lib/types';
 import { processPhoto } from '@/lib/imageProcessor';
 import { determineBuilderClass } from '@/lib/builderClass';
 import Card3DPreview from '@/components/card/Card3DPreview';
-import { renderCardFront, renderCardBack } from '@/lib/cardRenderer';
+import CardExporter, { CardExporterRef } from '@/components/card/CardExporter';
 import { Canvas } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import CapPop from '@/components/gamified/CapPop';
@@ -43,6 +43,7 @@ const STACKS = [
 ];
 
 export default function GamifiedTreasureJourney() {
+  const exporterRef = useRef<CardExporterRef>(null);
   const [profile, setProfile] = useState<BuilderProfile>(() => ({
     builderId: `HH-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
     verified: true,
@@ -151,8 +152,9 @@ export default function GamifiedTreasureJourney() {
     if (isPersisting) return;
     setIsPersisting(true);
     try {
-      const frontBase64 = await renderCardFront(profile);
-      const backBase64 = await renderCardBack(profile, shareUrl);
+      if (!exporterRef.current) throw new Error('Exporter not ready');
+      const frontBase64 = await exporterRef.current.exportFront();
+      const backBase64 = await exporterRef.current.exportBack();
 
       const res = await fetch('/api/cards', {
         method: 'POST',
@@ -220,8 +222,9 @@ export default function GamifiedTreasureJourney() {
     setDownloading(true);
     setDownloadFace('both');
     try {
-      const frontDataUrl = await renderCardFront(profile);
-      const backDataUrl = await renderCardBack(profile, shareUrl);
+      if (!exporterRef.current) throw new Error('Exporter not ready');
+      const frontDataUrl = await exporterRef.current.exportFront();
+      const backDataUrl = await exporterRef.current.exportBack();
       const safeName = profile.name.replace(/\s+/g, '-').toLowerCase() || 'builder';
 
       const aFront = document.createElement('a');
@@ -251,9 +254,10 @@ export default function GamifiedTreasureJourney() {
     setDownloading(true);
     setDownloadFace(face);
     try {
+      if (!exporterRef.current) throw new Error('Exporter not ready');
       const dataUrl = face === 'front'
-        ? await renderCardFront(profile)
-        : await renderCardBack(profile, shareUrl);
+        ? await exporterRef.current.exportFront()
+        : await exporterRef.current.exportBack();
       const safeName = profile.name.replace(/\s+/g, '-').toLowerCase() || 'builder';
       const a = document.createElement('a');
       a.href = dataUrl;
@@ -284,6 +288,7 @@ export default function GamifiedTreasureJourney() {
       background: 'linear-gradient(180deg, #075932 0%, #064e29 35%, #04381d 70%, #032814 100%)',
       minHeight: '100vh', color: '#ffffff', position: 'relative', overflowX: 'hidden',
     }}>
+      <CardExporter ref={exporterRef} profile={profile} shareUrl={shareUrl} />
 
       {/* ── UNLOCKED ITEM TOAST NOTIFICATION ──────────────────────────────────── */}
       <AnimatePresence>
